@@ -251,11 +251,9 @@ colnames(envfit_table_bray) <- c("DIM1", "DIM2", "R", "p")
 write.csv(envfit_table_bray, file.path(figs_dir, "Table_envfit_pfam.csv"))
 
 # NMDS plot - plot distance from glacier in color and the 4 localities with symbols
-
 # kegg
 names(mds_kegg_scores)[c(1, 2)] <- c("x", "y")
 mds_kegg_scores$z <- NA
-
 
 kegg_ordisurf <- ordisurf(mds_kegg ~ scaled_metadata_kegg[,"gl_dist"], plot = FALSE, scaling = 3)
 head(kegg_ordisurf)
@@ -265,12 +263,10 @@ head(contour_vals)
 
 p <- ggplot(data = contour_vals, aes(x, y, z = z)) + stat_contour(aes(colour = ..level..)) + theme_bw()
 
-
 nmds_kegg <- p + geom_text(data = mds_kegg_scores, aes(x = x, y = y, label = rownames(mds_kegg_scores)),
     colour = "red") + coord_equal() + theme_bw() + labs(x = "NMDS1", y = "NMDS2") +
     theme(panel.border = element_rect(fill = NA), axis.text.x = element_blank(),
         axis.text.y = element_blank(), legend.position = "none")
-
 
 kegg_heatmap_row <- pheatmap(data.matrix(otu_kegg),
                             #dendrogram = "row",
@@ -305,7 +301,6 @@ nmds_pfam <- p + geom_text(data = mds_pfam_scores, aes(x = x, y = y, label = row
         axis.text.y = element_blank(), legend.position = "none")
 
 # NMDS plot - plot distance from glacier in color and the 4 localities with symbols
-
 cairo_ps(file.path(figs_dir, "nmds_kegg.eps"), width=80/25.4, height=80/25.4, pointsize = 4, bg = FALSE, fallback_resolution = 300)
   nmds_kegg
 dev.off()
@@ -329,10 +324,10 @@ cairo_ps(file.path(figs_dir, "meanvar_plot_kegg.eps"), width=80/25.4, height=80/
   pointsize = 4, bg = FALSE, fallback_resolution = 300)
   meanvar.plot(otu_kegg_mva)
 dev.off()
-# cairo_ps(file.path(figs_dir, "meanvar_plot_pfam.eps"), width=80/25.4, height=80/25.4,
-#   pointsize = 4, bg = FALSE, fallback_resolution = 300)
-#   meanvar.plot(otu_pfam_mva)
-# dev.off()
+cairo_ps(file.path(figs_dir, "meanvar_plot_pfam.eps"), width=80/25.4, height=80/25.4,
+  pointsize = 4, bg = FALSE, fallback_resolution = 300)
+  meanvar.plot(otu_pfam_mva)
+dev.off()
 
 # prep data for gllvm
 #kegg
@@ -343,66 +338,63 @@ independent_variables_kegg = scale(metadata_matrix_kegg)
 most_abundant_kegg = otu_kegg[rowSums(otu_kegg)>100,]
 
 #pfam
-# metadata_matrix_pfam = as.matrix(sample_data(rarefied_pfam)[,c(10,12,13,18, 20,21)])
-#
-# independent_variables_pfam = scale(metadata_matrix_pfam)
-# most_abundant_pfam = otu_pfam[rowSums(otu_pfam)>100,]
-# rownames(most_abundant_pfam) = substr(rownames(most_abundant_pfam), 0,7)
+metadata_matrix_pfam = as.matrix(sample_data(rarefied_pfam)[,c(10,12,13,18, 20,21)])
+independent_variables_pfam = scale(metadata_matrix_pfam)
+most_abundant_pfam = otu_pfam[rowSums(otu_pfam)>100,]
+rownames(most_abundant_pfam) = substr(rownames(most_abundant_pfam), 0,7)
 
-# use subset of ASVs - most abundant
-
-# use genera - most abundant
+# use subset of KEGGs - most abundant
 seed_num = 1234
 # gllvm_kegg1 = gllvm(t(most_abundant_kegg), family = "negative.binomial")
-# gllvm_kegg2 = gllvm(t(most_abundant_kegg), independent_variables_kegg, family = "negative.binomial")
-#
-# gllvm_pfam1 = gllvm(t(most_abundant_pfam), family = "negative.binomial")
-# gllvm_pfam2 = gllvm(t(most_abundant_pfam), independent_variables_pfam, family = "negative.binomial")
-#
-# cairo_ps(file.path(figs_dir, "gllvm_kegg2_eval.eps"), width=80/25.4, height=80/25.4,
-#   pointsize = 4, bg = FALSE, fallback_resolution = 300)
-#   par(mfrow = c(3, 2), mar = c(4, 4, 2, 1))
-#   plot(gllvm_kegg2, var.colors = 1)
-# dev.off()
-#
-# cairo_ps(file.path(figs_dir, "gllvm_pfam2_eval.eps"), width=80/25.4, height=80/25.4,
-#   pointsize = 4, bg = FALSE, fallback_resolution = 300)
-#   par(mfrow = c(3, 2), mar = c(4, 4, 2, 1))
-#   plot(gllvm_pfam2, var.colors = 1)
-# dev.off()
+gllvm_kegg2 = gllvm(t(most_abundant_kegg), independent_variables_kegg, family = "negative.binomial")
 
-# criterias <- NULL
-# for(i in 1:5){
-#   fiti_kegg <- gllvm(t(most_abundant_kegg), independent_variables_kegg,
-#                 family = "negative.binomial", num.lv = i, sd.errors = FALSE,
-#                 formula = ~ gl_dist + DN + DOC, seed = 1234)
-#   criterias[i + 1] <- summary(fiti_kegg)$AICc
-#   names(criterias)[i + 1] = i
-# }
+gllvm_pfam1 = gllvm(t(most_abundant_pfam), family = "negative.binomial")
+gllvm_pfam2 = gllvm(t(most_abundant_pfam), independent_variables_pfam, family = "negative.binomial")
 
-# fit_env_kegg <- gllvm(t(most_abundant_kegg), independent_variables_kegg,
-#                       family = "negative.binomial", num.lv = 4,
-#                       formula = ~ gl_dist + DN + DOC,
-#                       seed = 1234)
-#
-# fit_env_pfam <- gllvm(t(most_abundant_pfam), independent_variables_pfam,
-#                       family = "negative.binomial", num.lv = 4,
-#                       formula = ~ gl_dist + DN + DOC,
-#                       seed = 1234)
+cairo_ps(file.path(figs_dir, "gllvm_kegg2_eval.eps"), width=80/25.4, height=80/25.4,
+  pointsize = 4, bg = FALSE, fallback_resolution = 300)
+  par(mfrow = c(3, 2), mar = c(4, 4, 2, 1))
+  plot(gllvm_kegg2, var.colors = 1)
+dev.off()
 
-# cairo_ps(file.path(figs_dir, "gllvm_kegg_coeff.eps"), width=80/25.4, height=80/25.4,
-#   pointsize = 4, bg = FALSE, fallback_resolution = 300)
-#   coefplot(fit_env_kegg, cex.ylab = 0.7, mar = c(4, 9, 2, 1),
-#            xlim.list = list(NULL, NULL, c(-8, 8)), mfrow=c(3,1))
-# dev.off()
+cairo_ps(file.path(figs_dir, "gllvm_pfam2_eval.eps"), width=80/25.4, height=80/25.4,
+  pointsize = 4, bg = FALSE, fallback_resolution = 300)
+  par(mfrow = c(3, 2), mar = c(4, 4, 2, 1))
+  plot(gllvm_pfam2, var.colors = 1)
+dev.off()
 
-# cairo_ps(file.path(figs_dir, "gllvm_pfam_coeff.eps"), width=80/25.4, height=80/25.4,
-#   pointsize = 4, bg = FALSE, fallback_resolution = 300)
-#   coefplot(fit_env_pfam, cex.ylab = 0.7, mar = c(4, 9, 2, 1),
-#            xlim.list = list(NULL, NULL, c(-4, 4)), mfrow=c(1,1))
-# dev.off()
+criterias <- NULL
+for(i in 1:5){
+  fiti_kegg <- gllvm(t(most_abundant_kegg), independent_variables_kegg,
+                family = "negative.binomial", num.lv = i, sd.errors = FALSE,
+                formula = ~ gl_dist + DN + DOC, seed = 1234)
+  criterias[i + 1] <- summary(fiti_kegg)$AICc
+  names(criterias)[i + 1] = i
+}
 
-# KEGG
+fit_env_kegg <- gllvm(t(most_abundant_kegg), independent_variables_kegg,
+                      family = "negative.binomial", num.lv = 4,
+                      formula = ~ gl_dist + DN + DOC,
+                      seed = 1234)
+
+fit_env_pfam <- gllvm(t(most_abundant_pfam), independent_variables_pfam,
+                      family = "negative.binomial", num.lv = 4,
+                      formula = ~ gl_dist + DN + DOC,
+                      seed = 1234)
+
+cairo_ps(file.path(figs_dir, "gllvm_kegg_coeff.eps"), width=80/25.4, height=80/25.4,
+  pointsize = 4, bg = FALSE, fallback_resolution = 300)
+  coefplot(fit_env_kegg, cex.ylab = 0.7, mar = c(4, 9, 2, 1),
+           xlim.list = list(NULL, NULL, c(-8, 8)), mfrow=c(3,1))
+dev.off()
+
+cairo_ps(file.path(figs_dir, "gllvm_pfam_coeff.eps"), width=80/25.4, height=80/25.4,
+  pointsize = 4, bg = FALSE, fallback_resolution = 300)
+  coefplot(fit_env_pfam, cex.ylab = 0.7, mar = c(4, 9, 2, 1),
+           xlim.list = list(NULL, NULL, c(-4, 4)), mfrow=c(1,1))
+dev.off()
+
+# use subset of KEGGs - most interesting as defined below
 
 most_interesting_kegg = c("K00855", # phosphoribulokinase                           Carbon fixation
                           "K01602", # RuBisCO small chain                           Carbon fixation
@@ -617,12 +609,10 @@ cairo_ps(file.path(figs_dir, "gllvm_kegg_sel2.eps"), width=80/25.4, height=80/25
 dev.off()
 
 
-### Comparison between ASV tables and functional tables
+###### Comparison between ASV tables and functional tables ######
 otu_euk_stand = readRDS(file = file.path(figs_dir, "otu_euk_stand.rds"))
 otu_bac_stand = readRDS(file = file.path(figs_dir, "otu_bac_stand.rds"))
 
-# mds_bac = readRDS(file = file.path(figs_dir, "mds_bac.rds"))
-# mds_euk = readRDS(file = file.path(figs_dir, "mds_euk.rds"))
 # KEGG
 otu_kegg_euk = otu_kegg_stand[,colnames(otu_kegg_stand) %in% colnames(otu_euk_stand)]
 otu_euk_kegg = otu_euk_stand[,colnames(otu_euk_stand) %in% colnames(otu_kegg_stand)]
@@ -631,7 +621,6 @@ otu_kegg_bac = otu_kegg_stand[,colnames(otu_kegg_stand) %in% colnames(otu_bac_st
 otu_bac_kegg = otu_bac_stand[,colnames(otu_bac_stand) %in% colnames(otu_kegg_stand)]
 
 # EUK
-
 mds_kegg_euk = vegan::metaMDS(t(otu_kegg_euk), distance = "bray", autotransform = FALSE, try = 1000)
 mds_euk_kegg = vegan::metaMDS(t(otu_euk_kegg), distance = "bray", autotransform = FALSE, try = 1000)
 dist_kegg_euk = vegan::vegdist(t(otu_kegg_euk), method = "bray")
@@ -649,13 +638,11 @@ mds_bac_kegg = vegan::metaMDS(t(otu_bac_kegg), distance = "bray", autotransform 
 dist_kegg_bac = vegan::vegdist(t(otu_kegg_bac), method = "bray")
 dist_bac_kegg = vegan::vegdist(t(otu_bac_kegg), method = "bray")
 
-
 pro <- procrustes(X = mds_kegg_bac, Y = mds_bac_kegg, symmetric = FALSE)
 pro
 
 protest(X = mds_kegg_bac, Y = mds_bac_kegg, scores = "sites", permutations = 999)
 mantel(dist_kegg_bac, dist_bac_kegg, method = "spearman", permutations = 9999, na.rm = TRUE)
-
 
 # PFAM
 otu_pfam_euk = otu_pfam_stand[,colnames(otu_pfam_stand) %in% colnames(otu_euk_stand)]
@@ -669,7 +656,6 @@ mds_pfam_euk = vegan::metaMDS(t(otu_pfam_euk), distance = "bray", autotransform 
 mds_euk_pfam = vegan::metaMDS(t(otu_euk_pfam), distance = "bray", autotransform = FALSE, try = 1000)
 dist_pfam_euk = vegan::vegdist(t(otu_pfam_euk), method = "bray")
 dist_euk_pfam = vegan::vegdist(t(otu_euk_pfam), method = "bray")
-
 
 pro <- procrustes(X = mds_pfam_euk, Y = mds_euk_pfam, symmetric = FALSE)
 pro
@@ -693,35 +679,29 @@ mantel(dist_pfam_bac, dist_bac_pfam, method = "spearman", permutations = 9999, n
 ## Look at variability in each chronosequence
 # Plot PFAMs of importance in xy plot
 # PFAM
+meta_pfam = data.frame(sample_data(rarefied_pfam))
+cq = unique(data.frame(sample_data(rarefied_pfam))$locality)[1]
+data_pfam = data.frame(otu_pfam)
+sub_metadata = data.frame(sample_data(rarefied_pfam))
 
-# meta_pfam = data.frame(sample_data(rarefied_pfam))
-# cq = unique(data.frame(sample_data(rarefied_pfam))$locality)[1]
-# data_pfam = data.frame(otu_pfam)
-# sub_metadata = data.frame(sample_data(rarefied_pfam))
-#
-# for (cq in unique(data.frame(sample_data(rarefied_pfam))$locality)) {
-#
-#   pfam_sel = data_pfam[,colnames(data_pfam) %in% rownames(sub_metadata[sub_metadata$locality==cq,]) ]
-#   rownames(pfam_sel) = substr(rownames(pfam_sel), 0,7)
-#   pfam_selection = pfam_sel[rownames(pfam_sel) %in% most_interesting_pfam, ]
-#
-# }
+for (cq in unique(data.frame(sample_data(rarefied_pfam))$locality)) {
+  pfam_sel = data_pfam[,colnames(data_pfam) %in% rownames(sub_metadata[sub_metadata$locality==cq,]) ]
+  rownames(pfam_sel) = substr(rownames(pfam_sel), 0,7)
+  pfam_selection = pfam_sel[rownames(pfam_sel) %in% most_interesting_pfam, ]
+}
 
 # reads per 21480 sample pfam
 
 # KEGG
-
 meta_kegg = data.frame(sample_data(rarefied_kegg))
 cq = unique(data.frame(sample_data(rarefied_kegg))$locality)[1]
 data_kegg = data.frame(otu_kegg)
 sub_metadata = data.frame(sample_data(rarefied_kegg))
 
 for (cq in unique(data.frame(sample_data(rarefied_kegg))$locality)) {
-
   kegg_sel = data_kegg[,colnames(data_kegg) %in% rownames(sub_metadata[sub_metadata$locality==cq,]) ]
   rownames(kegg_sel)[1]
   kegg_selection = kegg_sel[rownames(kegg_sel) %in% most_interesting_kegg, ]
-
 }
 
 # Write function that calculates pathway contribution from KEGG reads coverage
@@ -759,12 +739,9 @@ traits_name = c("Carbon_fixation",
                 "Oxy_photosynthesis",
                 "Anoxy_photosynthesis",
                 "Bacteriorhodopsin"
-
-
                 )
 
 # Function to sum up traits from KEGGs
-
 summarize_kegg_traits = function(kegg_selection){
   trait_table = data.frame(matrix(ncol=ncol(kegg_selection),
                           nrow=length(traits_name),
@@ -968,14 +945,10 @@ cairo_ps(file.path(figs_dir, "gllvm_traits_full_coeff2.eps"), width=80/25.4, hei
   coefplot(fit_env_traits_full2, cex.ylab = 0.8)
 dev.off()
 
-
-
-
-## heatmaps
+## heatmaps of traits
 
 traits_table1 = summarize_kegg_traits(tpm_kegg_table)
 traits_table1[is.na(traits_table1)] <- 0
-
 
 traits_table1 = traits_table1[which(rowMeans(!traits_table1 == 0) > 1/29),]
 traits_table1 = scale(t(traits_table1))
@@ -992,12 +965,10 @@ traits_heatmap_row <- pheatmap(data.matrix(traits_table1),
 
 cairo_ps(file.path(figs_dir, "traits_heatmap_row.eps"))
   traits_heatmap_row
-
 dev.off()
 
 kegg_table1 = tpm_kegg_table
 kegg_table1[is.na(kegg_table1)] <- 0
-
 
 kegg_table1 = kegg_table1[which(rowMeans(!kegg_table1 == 0) > 1/29),]
 
@@ -1015,7 +986,6 @@ kegg_heatmap_row <- pheatmap(data.matrix(kegg_table1),
 
 cairo_ps(file.path(figs_dir, "kegg_heatmap_row.eps"))
  kegg_heatmap_row
-
 dev.off()
 
 
@@ -1066,8 +1036,5 @@ dev.off()
 summary(t(domain_table_prop))
 
 
-
 save.image(file.path(figs_dir, "metags_stats.Rdata"))
-
-
 
