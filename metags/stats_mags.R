@@ -510,11 +510,9 @@ traits_name = c("Carbon_fixation",
                 "Anoxy_photosynthesis",
                 "Bacteriorhodopsin"
 
-
                 )
 
 # Function to sum up traits from KEGGs
-
 summarize_kegg_traits = function(kegg_selection){
   trait_table = data.frame(matrix(ncol=ncol(kegg_selection),
                           nrow=length(traits_name),
@@ -523,19 +521,15 @@ summarize_kegg_traits = function(kegg_selection){
   # Calculate trait distribution
   Carbon_fixation = colSums(kegg_selection["K00855",] + kegg_selection["K01602",], na.rm = TRUE)/2
   trait_table["Carbon_fixation",] = Carbon_fixation
-
   Aerobic_methane_oxidation = kegg_selection["K08684",]
   trait_table["Aerobic_methane_oxidation",] = Aerobic_methane_oxidation
-
   Aerobic_respiration = colSums(kegg_selection["K02256",] + kegg_selection["K02262",], na.rm = TRUE)/2 +
                         colSums(kegg_selection["K02274",] + kegg_selection["K02276",], na.rm = TRUE)/2
   trait_table["Aerobic_respiration",] = Aerobic_respiration
-
   Anaerobic_C_fixation = colSums(kegg_selection["K00174",] + kegg_selection["K00175",] +
                                  kegg_selection["K00244",] + kegg_selection["K01648",], na.rm = TRUE)/4 +
                         colSums(kegg_selection["K00194",] + kegg_selection["K00197",], na.rm = TRUE)/2
   trait_table["Anaerobic_C_fixation",] = Anaerobic_C_fixation
-
   Glycoside_hydrolases = colSums(kegg_selection["K01187",] + kegg_selection["K01199",] +
                                  kegg_selection["K01210",] + kegg_selection["K01188",] +
                                  kegg_selection["K05349",] + kegg_selection["K01179",] +
@@ -544,17 +538,13 @@ summarize_kegg_traits = function(kegg_selection){
                                  kegg_selection["K01176",] + kegg_selection["K01182",] +
                                  kegg_selection["K01194",], na.rm = TRUE)
   trait_table["Glycoside_hydrolases",] = Glycoside_hydrolases
-
   CO_oxidation = colSums(kegg_selection["K03518",] + kegg_selection["K03519",] +
                                  kegg_selection["K03520",] , na.rm = TRUE)/3
   trait_table["CO_oxidation",] = CO_oxidation
-
   Fermentation = kegg_selection["K00016",]
   trait_table["Fermentation",] = Fermentation
-
   Methanogenesis = colSums(kegg_selection["K00400",] + kegg_selection["K00401",], na.rm = TRUE)/2
   trait_table["Methanogenesis",] = Methanogenesis
-
   Methanotrophy = colSums(kegg_selection["K10944",] + kegg_selection["K10945",] +
                           kegg_selection["K10946",] + kegg_selection["K16157",] +
                           kegg_selection["K16256",] + kegg_selection["K23995",] +
@@ -572,84 +562,60 @@ summarize_kegg_traits = function(kegg_selection){
                           kegg_selection["K00122",] + kegg_selection["K00125",] +
                           kegg_selection["K15022",] + kegg_selection["K22015",], na.rm = TRUE)/32
   trait_table["Methanotrophy",] = Methanotrophy
-
   Ammonification = colSums(kegg_selection["K03385",] + kegg_selection["K05904",] +
                            kegg_selection["K04561",], na.rm = TRUE)/3
   trait_table["Ammonification",] = Ammonification
-
   ANAMMOX = kegg_selection["K10535",]
   trait_table["ANAMMOX",] = ANAMMOX
-
   Nitrite_red = colSums(kegg_selection["K17877",], na.rm = TRUE) +
                 colSums(kegg_selection["K00362",] + kegg_selection["K00363",] +
                         kegg_selection["K00366",] + kegg_selection["K00368",] +
                         kegg_selection["K15864",], na.rm = TRUE)/5
   trait_table["Nitrite_red",] = Nitrite_red
-
   Nitrous_oxide_red = colSums(kegg_selection["K00376",], na.rm = TRUE)
   trait_table["Nitrous_oxide_red",] = Nitrous_oxide_red
-
   Nitric_oxide_red = colSums(kegg_selection["K04561",] + kegg_selection["K02305",], na.rm = TRUE)/2 +
                      colSums(kegg_selection["K15877",] , na.rm = TRUE)
   trait_table["Nitric_oxide_red",] = Nitric_oxide_red
-
   Nitrate_red = colSums(kegg_selection["K02567",] + kegg_selection["K02568",], na.rm = TRUE)/2 +
                 colSums(kegg_selection["K00367",])
   trait_table["Nitrate_red",] = Nitrate_red
-
   Ammonia_oxid = colSums(kegg_selection["K10944",] + kegg_selection["K10945",] +
                          kegg_selection["K10946",], na.rm = TRUE)/3
   trait_table["Ammonia_oxid",] = Ammonia_oxid
-
   N_fixation = colSums(kegg_selection["K00531",] + kegg_selection["K02586",] +
                        kegg_selection["K02588",] + kegg_selection["K02591",], na.rm = TRUE)/4
   trait_table["N_fixation",] = N_fixation
-
   Nitrite_oxid = colSums(kegg_selection["K00370",] + kegg_selection["K00371",], na.rm = TRUE)/2
   trait_table["Nitrite_oxid",] = Nitrite_oxid
-
   Sulfite_oxid = colSums(kegg_selection["K00387",], na.rm = TRUE) +
                  colSums(kegg_selection["K05301",] + kegg_selection["K00386",], na.rm = TRUE)/2 +
                  colSums(kegg_selection["K21307",] + kegg_selection["K21308",] +
                          kegg_selection["K21309",], na.rm = TRUE)/3
   trait_table["Nitrite_oxid",] = Nitrite_oxid
-
   Sulfite_red = colSums(kegg_selection["K16950",] + kegg_selection["K16951",] +
                         kegg_selection["K00385",], na.rm = TRUE)/3
   trait_table["Sulfite_red",] = Sulfite_red
-
   Sulfur_red = colSums(kegg_selection["K16952",] + kegg_selection["K17219",] +
                        kegg_selection["K17220",] + kegg_selection["K17221",], na.rm = TRUE)/4
   trait_table["Sulfur_red",] = Sulfur_red
-
   Sulfide_oxid = colSums(kegg_selection["K17229",] + kegg_selection["K17230",], na.rm = TRUE)/2
   trait_table["Sulfide_pxid",] = Sulfide_oxid
-
   Sulfur_oxid = colSums(kegg_selection["K16952",], na.rm = TRUE)
   trait_table["Sulfur_oxid",] = Sulfur_oxid
-
   Sulfate_red = colSums(kegg_selection["K00860",] + kegg_selection["K00956",] +
                         kegg_selection["K00957",], na.rm = TRUE)/3 +
                 colSums(kegg_selection["K00394",] + kegg_selection["K00395",] +
                         kegg_selection["K11180",], na.rm = TRUE)/3 -
                 Sulfite_oxid
   trait_table["Sulfate_red",] = Sulfate_red
-
   Thiosulfate_oxid = colSums(kegg_selection["K17222",] + kegg_selection["K17223",] +
                              kegg_selection["K17226",] + kegg_selection["K17227",] +
                              kegg_selection["K17224",] + kegg_selection["K17225",] +
                              kegg_selection["K22622",], na.rm = TRUE)/7
   trait_table["Thiosulfate_oxid",] = Thiosulfate_oxid
-
-  # Thiosulfate_disp1 =
-  # trait_table["Thiosulfate_disp1",] = Thiosulfate_disp1
-#
-  # Thiosulfate_disp2 =
-  # trait_table["Thiosulfate_disp2",] = Thiosulfate_disp2
-
   Polysulfide_reduction = colSums(kegg_selection["K08352",], na.rm = TRUE)
   trait_table["Polysulfide_reduction",] = Polysulfide_reduction
-
   Oxy_photosynthesis = colSums(kegg_selection["K02703",] + kegg_selection["K02704",] +
                                kegg_selection["K02705",] + kegg_selection["K02706",] +
                                kegg_selection["K02707",] + kegg_selection["K02708",], na.rm = TRUE)/12 +
@@ -657,19 +623,17 @@ summarize_kegg_traits = function(kegg_selection){
                                kegg_selection["K02691",] + kegg_selection["K02692",] +
                                kegg_selection["K02693",] + kegg_selection["K02694",], na.rm = TRUE)/12
   trait_table["Oxy_photosynthesis",] = Oxy_photosynthesis
-
   Anoxy_photosynthesis = # colSums(kegg_selection["K08940",] + kegg_selection["K08941",] +
                          #         kegg_selection["K08942",] + kegg_selection["K08943",], na.rm = TRUE)/6 +
                          colSums(kegg_selection["K08928",] + kegg_selection["K08929",], na.rm = TRUE)/2
   trait_table["Anoxy_photosynthesis",] = Anoxy_photosynthesis
-
   Bacteriorhodopsin = kegg_selection["K04641",]
   trait_table["Bacteriorhodopsin",] = Bacteriorhodopsin
   return(trait_table)
 
 }
 
-# good bins
+# calculate traits in good bins
 colnames(bin_kegg_selection)
 bin_kegg_avTPM = bin_kegg_selection[,c("avTPM", "besthit", "Bin.ID")]
 test = reshape(bin_kegg_avTPM, idvar = "besthit", timevar = "Bin.ID", direction = "wide")
@@ -684,8 +648,8 @@ traits_table = traits_table[rowSums(traits_table) > 0, ]
 traits_table$besthit = rownames(traits_table)
 
 traits_table = melt(traits_table, id.vars = c("besthit"), variable.name = "Bin.ID")
-# PLOT KEGG Pathways PER BIN
 
+# PLOT KEGG Pathways PER BIN
 # cairo_ps(file.path("/cluster/projects/nn9745k/jing/02_results/svalbard", "bin_kegg_pathways.eps"), width=80/25.4, height=80/25.4,
 cairo_ps(file.path("/cluster/home/alexaei/figs", "bin_kegg_pathways.eps"), width=80/25.4, height=80/25.4,
   pointsize = 4, bg = FALSE, fallback_resolution = 300)
@@ -699,11 +663,9 @@ cairo_ps(file.path("/cluster/home/alexaei/figs", "bin_kegg_pathways.eps"), width
     axis.line.x = element_line(color = "grey")) +
   scale_fill_distiller(palette = "RdPu") +
   geom_tile()
-
-
 dev.off()
 
-# interesting bins
+# calcuate traits in interesting bins
 colnames(intres_bin_kegg_selection)
 intres_bin_kegg_avTPM = intres_bin_kegg_selection[,c("avTPM", "besthit", "Bin.ID")]
 test = reshape(intres_bin_kegg_avTPM, idvar = "besthit", timevar = "Bin.ID", direction = "wide")
@@ -721,12 +683,11 @@ intres_traits_table_binary = intres_traits_table
 intres_traits_table_binary[intres_traits_table_binary>0] <-1
 intres_traits_table_binary[intres_traits_table_binary<0] <-0
 
-
 intres_traits_table$besthit = rownames(intres_traits_table)
 
 intres_traits_table = melt(intres_traits_table, id.vars = c("besthit"), variable.name = "Bin.ID")
-# PLOT KEGG Pathways PER BIN
 
+# PLOT KEGG Pathways PER BIN
 cairo_ps(file.path("/cluster/home/alexaei/figs", "intres_bin_kegg_pathways.eps"), width=80/25.4, height=80/25.4,
   pointsize = 4, bg = FALSE, fallback_resolution = 300)
   ggplot(intres_traits_table, aes(besthit, Bin.ID, fill= -value)) +
@@ -739,13 +700,10 @@ cairo_ps(file.path("/cluster/home/alexaei/figs", "intres_bin_kegg_pathways.eps")
     axis.line.x = element_line(color = "grey")) +
   scale_fill_distiller(palette = "RdPu") +
   geom_tile()
-
-
 dev.off()
 
 inters_traits_heatmap_row <- pheatmap(data.matrix(intres_traits_table_binary),
-                            #dendrogram = "row",
-                            xlab = "", ylab = "",
+                            #dendrogram = "row"
                             clustering_distance_col = "correlation",
                             clustering_distance_row = "canberra",
                             main = "",
@@ -755,7 +713,6 @@ inters_traits_heatmap_row <- pheatmap(data.matrix(intres_traits_table_binary),
 
 cairo_ps(file.path("/cluster/home/alexaei/figs", "inters_traits_heatmap_row.eps"))
   inters_traits_heatmap_row
-
 dev.off()
 
 # plot bin dynamics
@@ -769,7 +726,6 @@ BuPu.pal <- RColorBrewer::brewer.pal(7,"BuPu")
 
 inters_bins_heatmap_row <- pheatmap(data.matrix(interes_bintable_tpm),
                             #dendrogram = "row",
-                            xlab = "", ylab = "",
                             clustering_distance_col = "correlation",
                             clustering_distance_row = "canberra",
                             color = RdPu.pal,
@@ -780,17 +736,14 @@ inters_bins_heatmap_row <- pheatmap(data.matrix(interes_bintable_tpm),
 
 cairo_ps(file.path("/cluster/home/alexaei/figs", "inters_bins_heatmap_row.eps"))
   inters_bins_heatmap_row
-
 dev.off()
 
 #taxonomy
 bintable[bintable$Bin.ID %in% rownames(data_ht1 )]
 
- # add categories of lakes (< 350 m, > 350 and < 3350, > 3350 )
- # same order as inters_traits_heatmap_row.eps
+# PLOT FIGURE 4
 
- # Heatmap 1
-
+# MAGs' traits
 data_ht1 = t(intres_traits_table_binary)
 data_ht1 <- data_ht1[ order(row.names(data_ht1)), ]
 
@@ -829,7 +782,6 @@ ht1 = Heatmap(data_ht1, name = "traits", km = 3,
 
 cairo_ps(file.path("/cluster/home/alexaei/figs", "inters_traits_bin_heatmap.eps"))
   ht1
-
 dev.off()
 
 # Heatmap 2
@@ -849,7 +801,7 @@ ht1 + ht2
 dev.off()
 
 # boxplots
-data_ht2
+# data_ht2
 
 lakes_550 = data_ht2[,metadata4$gl_dist<551]
 lakes_3300 = data_ht2[,metadata4$gl_dist>551 & metadata4$gl_dist<3300]
@@ -866,7 +818,7 @@ ha_mix_right2 = HeatmapAnnotation(bxplt = .boxplot2,
 ha_mix_right3 = HeatmapAnnotation(bxplt = .boxplot3,
                               which = "row", width = unit(2, "cm"))
 
-ht_test = Heatmap(data_ht1, name = "traits", km = 3,
+ht_figure4 = Heatmap(data_ht1, name = "traits", km = 3,
               col = RdPu.pal,
               show_column_dend = FALSE,
               show_row_dend = FALSE,
@@ -880,140 +832,9 @@ ht_test = Heatmap(data_ht1, name = "traits", km = 3,
       ha_mix_right2 +
       ha_mix_right3
 
-cairo_ps(file.path("/cluster/home/alexaei/figs", "test_figure4.eps"))
-ht_test
+cairo_ps(file.path("/cluster/home/alexaei/figs", "figure4.eps"))
+ht_figure4 
 dev.off()
-
-# Metacyc
-
-intres_metacyc_bin = metacyc_pathways[metacyc_pathways$"V1" %in% intres_bintable$Bin.ID,]
-
-rownames(intres_metacyc_bin) = intres_metacyc_bin$V1
-intres_metacyc_bin = intres_metacyc_bin[,3:ncol(intres_metacyc_bin)]
-
-intres_metacyc_bin[intres_metacyc_bin == "NF"] <- 0
-
-# select interesting pathways
-
-test = intres_metacyc_bin[,match(intres_metacyc_tax$V1, metacyc_tax$V1)]
-
-names_intres_metacyc = c("Calvin-Benson-Bassham cycle",
-                         "Carbon fixation in photosynthetic organisms",
-                         "Methane metabolism",
-                         "Nitrogen metabolism",
-                         "Photosynthesis",
-                         "Reductive carboxylate cycle",
-                         "Sulfur metabolism",
-                         "aerobic respiration II",
-                         "aerobic respiration III",
-                         "ammonia oxidation II (anaerobic)",
-                         "catechol degradation I",
-                         "catechol degradation II",
-                         "catechol degradation to beta-ketoadipate",
-                         "catechol degradation to 2-oxopent-4-enoate I",
-                         "catechol degradation to 2-oxopent-4-enoate II",
-                         "methanogenesis from CO2",
-                         "methanogenesis from acetate",
-                         "methanol oxidation to formaldehyde I",
-                         "nitrate reduction I",
-                         "nitrate reduction II",
-                         "nitrate reduction IV",
-                         "nitrate reduction V",
-                         "nitrate reduction VI",
-                         "nitrogen fixation",
-                         "oxygenic photosynthesis",
-                         "phosphate acquisition",
-                         "photorespiration",
-                         "photosynthesis light reactions",
-                         "reductive TCA cycle I",
-                         "reductive TCA cycle II",
-                         "sulfate reduction I",
-                         "sulfate reduction II",
-                         "sulfate reduction IV",
-                         "sulfate reduction V",
-                         "sulfide oxidation III",
-                         "sulfite oxidation I",
-                         "sulfite oxidation II",
-                         "sulfite oxidation III",
-                         "sulfite oxidation IV",
-                         "sulfur oxidation I",
-                         "sulfur oxidation II",
-                         "thiosulfate disproportionation III",
-                         "thiosulfate oxidation II",
-                         "bacteriochlorophyll biosynthesis",
-                         "carotenoid biosynthesis",
-                         "sulfide oxidation A ferrooxidans",
-                         "sulfide oxidation S novella",
-                         "sulfur amino acid biosynthesis S cerevisiae",
-                         "sulfur metabolism D sulfoexigens",
-                         "sulfur oxidation A ambivalens")
-colnames(test) = names_intres_metacyc
-
-data_ht3 = apply(test, 2,            # Specify own function within apply
-                    function(x) as.numeric(as.character(x)))
-rownames(data_ht3) = rownames(test)
-
-data_ht3 = data_ht3[,c("Calvin-Benson-Bassham cycle",
-                       "Methane metabolism",
-                       "Reductive carboxylate cycle",
-                        "aerobic respiration II",
-                        "aerobic respiration III",
-                        "ammonia oxidation II (anaerobic)",
-                        "methanogenesis from CO2",
-                        "methanogenesis from acetate",
-                        "methanol oxidation to formaldehyde I",
-                         "nitrate reduction I",
-                         "nitrate reduction II",
-                         "nitrate reduction IV",
-                         "nitrate reduction V",
-                         "nitrate reduction VI",
-                         "nitrogen fixation",
-                         "oxygenic photosynthesis",
-                        "reductive TCA cycle I",
-                        "reductive TCA cycle II",
-                         "sulfate reduction I",
-                         "sulfate reduction II",
-                         "sulfate reduction IV",
-                         "sulfate reduction V",
-                         "sulfide oxidation III",
-                         "sulfite oxidation I",
-                         "sulfite oxidation II",
-                         "sulfite oxidation III",
-                         "sulfite oxidation IV",
-                         "sulfur oxidation I",
-                         "sulfur oxidation II",
-                         "thiosulfate disproportionation III",
-                         "thiosulfate oxidation II",
-                         "bacteriochlorophyll biosynthesis",
-                         "carotenoid biosynthesis",
-                         "sulfide oxidation A ferrooxidans",
-                         "sulfide oxidation S novella",
-                         "sulfur oxidation A ambivalens"
-
-
-
-  )]
-
-data_ht3 = data_ht3[rowSums(data_ht3) > 0, colSums(data_ht3) > 0]
-
-ht3 = Heatmap(data_ht3, name = "ht1", km = 3,
-              col = RdPu.pal,
-              column_names_gp = gpar(fontsize = 9),
-              row_names_gp = gpar(fontsize = 9))
-
-interes_metacycbin_tpm = bintable_tpm[rownames(bintable_tpm) %in% rownames(data_ht3),]
-data_ht4 = scale(interes_metacycbin_tpm)
-
-data_ht4 <- data_ht4[ order(row.names(data_ht4)), ]
-ht4 = Heatmap(data_ht4, name = "ht2",
-        col = BuPu.pal,
-        column_names_gp = gpar(fontsize = 9),
-        row_names_gp = gpar(fontsize = 9))
-
-cairo_ps(file.path("/cluster/projects/nn9745k/jing/02_results/svalbard", "inters_bins_heatmap_metacyc.eps"))
-ht3 + ht4
-dev.off()
-
 
 ######### Plot taxonomy based on metagenomic reads ###############
 
