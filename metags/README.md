@@ -18,9 +18,9 @@ This is a slurm script specifying the metagenomic analysis to run SqueezeMeta in
 This is a slurm script specifying the metagenomic analysis to run SqueezeMeta in indiviudal assembly mode and later merging the assemblies.
 
 ### stats_mags.R 
-This contains the code for processing the metagenomes assembled genomes (MAGs) from the co-assembly. We refer to it as the genome centric analysis as annotations and coverage of high quality MAGs were analyzed.
+This contains the code for statistical analysis ofthe metagenomes assembled genomes (MAGs) from the co-assembly as well as data visualization. We refer to it as the genome centric analysis as annotations and coverage of high quality MAGs were analyzed.
 
 ### stats_metags.R
-This contains the code for processing the individual assembled metagenomes. Here we analyzed annotations from the contigs. We refer to it as the gene centric analysis as gene annotations from MAGs were used in the analysis.
+This contains the code for statistical analysis of the individual assembled metagenomes and data visualization. Here we analyzed annotations from the contigs. We refer to it as the gene centric analysis as gene annotations from MAGs were used in the analysis.
 
 
