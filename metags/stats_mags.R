@@ -168,7 +168,6 @@ metadata_1 = metadata[,c(7, 10, 12:15, 17:33)]
 
 scaled_metadata = scale(metadata_1)
 
-
 ## Parse data
 rownames(scaled_metadata) = metadata$sample_id
 
@@ -807,9 +806,9 @@ lakes_550 = data_ht2[,metadata4$gl_dist<551]
 lakes_3300 = data_ht2[,metadata4$gl_dist>551 & metadata4$gl_dist<3300]
 lakes_10000 = data_ht2[,metadata4$gl_dist>3300]
 
-.boxplot1 = anno_boxplot(lakes_550, which = "row", outine = FALSE) # log = "y" or ylim = c(0,5)
-.boxplot2 = anno_boxplot(lakes_3300, which = "row", outine = FALSE)
-.boxplot3 = anno_boxplot(lakes_10000, which = "row", outine = FALSE)
+.boxplot1 = anno_boxplot(lakes_550, which = "row", outline = FALSE) # log = "y" or ylim = c(0,5)
+.boxplot2 = anno_boxplot(lakes_3300, which = "row", outline = FALSE)
+.boxplot3 = anno_boxplot(lakes_10000, which = "row", outline = FALSE)
 
 ha_mix_right1 = HeatmapAnnotation(bxplt = .boxplot1,
                               which = "row", width = unit(2, "cm"))
@@ -835,171 +834,6 @@ ht_figure4 = Heatmap(data_ht1, name = "traits", km = 3,
 cairo_ps(file.path("/cluster/home/alexaei/figs", "figure4.eps"))
 ht_figure4 
 dev.off()
-
-######### Plot taxonomy based on metagenomic reads ###############
-
-genus_abund_table = read.table(file = file.path(figs_dir, "genus_abund_table.tsv"), sep = "\t")
-
-# Plot 3 domains
-
-arch_abund_table  = genus_abund_table[grep("k_Archaea", rownames(genus_abund_table)),]
-bac_abund_table  = genus_abund_table[grep("k_Bacteria", rownames(genus_abund_table)),]
-euk_abund_table  = genus_abund_table[grep("k_Eukaryota", rownames(genus_abund_table)),]
-vir_abund_table  = genus_abund_table[grep("k_Viruses", rownames(genus_abund_table)),]
-colSums(vir_abund_table, na.rm = TRUE)
-
-domain_table = rbind(colSums(arch_abund_table, na.rm = TRUE),
-                     colSums(bac_abund_table, na.rm = TRUE),
-                     colSums(euk_abund_table, na.rm = TRUE))
-rownames(domain_table) = c("Archaea", "Bacteria", "Eukaryota")
-domain_table_prop = prop.table(domain_table, margin = 2)*100
-
-# calculate proportions based on phylum data
-melted_domain_table = melt(domain_table_prop)
-melted_domain_table <- dplyr::arrange(melted_domain_table, Var2, desc(value))
-melted_domain_table$Var2 <- factor(melted_domain_table$Var2 , levels = unique(melted_domain_table$Var2))
-
-class_colors <- setNames(color_palette_euk, levels(melted_domain_table$Var1))
-taxonomy = rownames(domain_table)
-
-svg(file.path(figs_dir, "boxplot_meta_domain.svg"), width=120/25.4, height=160/25.4, pointsize = 6, bg = FALSE)
-  ggplot(melted_domain_table, aes(x = Var2, y = value, fill = Var1))+
-     geom_bar(stat = "identity", position = "stack", alpha = .5) +
-     guides(fill = guide_legend(title = taxonomy)) +
-     coord_flip() +
-     theme(axis.text = element_text(size=6),
-       axis.title = element_text(size=10, face="bold"),
-       legend.text = element_text(size=8),
-       plot.background = element_rect(fill = "white"),
-       panel.background = element_rect(fill = "white"),
-       axis.line.x = element_line(color = "grey")) +
-     xlab("lake systems") +
-     ylab("proportion of reads [%]") +
-     scale_fill_manual(values = class_colors) +
-     scale_x_discrete(limits = rev(levels(melted_domain_table$Var2))
-     )
-dev.off()
-
-summary(t(domain_table_prop))
-
-# Plot Bacterial phyla
-
-# Plot Archaeal phyla
-
-# Plot Eukaryotic phyla
-
-# Plot based on 16S rRNA genes
-
-# Comparison between Metabarcoding - Metagenomic
-
-### PLS models comparison and VIPs
-
-set.seed(1234)
-test.id <- sample(1:nrow(X), size = .2*nrow(X)) ## Randomly choose 20% of rows for test set
-
-test.data <- data[test.id,]  ## Subset to include rows designated to test set
-train.data <- data[-test.id,]  ## Exclude rows designated to test set
-
-# ASV bacteria
-
-path_out = "/cluster/projects/nn9745k/jing/02_results/svalbard"
-path_bac = file.path(path_out, "bacteria/dada2optimized")
-path_scripts = "/cluster/projects/nn9745k/jing/scripts"
-
-ASV_bac = as.matrix(read.table(file.path(path_bac,"ASV_table.tsv"), header=T, check.names=FALSE))
-tax_bac = as.matrix(read.table(file.path(path_bac,"Taxonomy_table_silva.tsv"), header=T, check.names=FALSE))
-
-metadata = read.csv(file.path(path_scripts, "metadata", "svfi19.tsv"), header=T, check.names=FALSE, sep = "\t", stringsAsFactors=FALSE,colClasses=cls)
-
-## Parse data
-rownames(metadata) = metadata$sample_id
-rownames(ASV_bac) = str_split(rownames(ASV_bac), pattern = "_", simplify = TRUE)[, 1]
-
-
-
-dim(ASV_bac)
-bac_otu <- otu_table(t(ASV_bac), taxa_are_rows = TRUE)
-dim(bac_otu)
-bac_tax <- tax_table(tax_bac)
-bac_physeq <- phyloseq(bac_otu, bac_tax, sample_data(data.frame(metadata)))
-bac_physeq
-
-bac_physeq_clean  = subset_taxa(bac_physeq, Kingdom == "Bacteria")
-bac_physeq_clean  = subset_taxa(bac_physeq_clean, Order != "Chloroplast")
-bac_physeq_clean  = subset_taxa(bac_physeq_clean, Family != "Mitochondria")
-
-bac_physeq_9000 <- prune_samples(sample_sums(bac_physeq_clean)>=9000, bac_physeq_clean) # removes two samples SV011, SV021
-rarefied_bac <- rarefy_even_depth(bac_physeq_9000, sample.size = min(sample_sums(bac_physeq_9000)),
-          rngseed = FALSE, replace = TRUE, trimOTUs = TRUE, verbose = TRUE) #Normalizing species data
-
-metadata = sample_data(rarefied_bac)
-
-asv = t(otu_table(rarefied_bac))
-
-CO2 = as.matrix(metadata$CO2_sat)
-rownames(CO2) = rownames(metadata)
-
-asv_co2 = merge(asv, CO2, by = 0)
-
-asv_co2 = na.omit(asv_co2)
-
-asv_co2 = asv_co2[,2:ncol(asv_co2)]
-
-pa_co2 = asv_co2
-pa_co2[pa_co2>0] = 1
-
-test = asv_co2[,colSums(pa_co2) > 3]
-
-
-
-
-control <- trainControl("repeatedcv", number = 10, selectionFunction = "oneSE")
-
-prePoc = preProcess(
-  test,
-  method = "scale",
-  thresh = 0.95,
-  pcaComp = NULL,
-  na.remove = TRUE,
-  k = 5,
-  knnSummary = mean,
-  outcome = NULL,
-  fudge = 0.2,
-  numUnique = 3,
-  verbose = FALSE,
-  freqCut = 25/5,
-  uniqueCut = 3,
-  cutoff = 0.9,
-  rangeBounds = c(0, 1)
-)
-
-co2_sat_pls_rcv <- train(V1 ~ ., data = test,
- method = "pls",
- tuneLength = 20,
- trControl = control,
- preProc = c("center","scale"),
- ncomp = 10
- )
-
-co2_sat_pls_rcv$bestTune
-
-summary(co2_sat_pls_rcv$finalModel)
-
-# genera
-
-
-
-# KEGG table
-
-tpm_kegg_table
-
-
-# traits table
-
-traits_table
-
-# MAGs
-
 
 save.image(file.path(figs_dir, "metags_stats.Rdata"))
 
