@@ -9,7 +9,6 @@ cd path to repositories
 git clone https://gitlab.com/eiler_lab/chronosequences.git
 ```
 
-
 ## Authors and acknowledgment
 Scripts were written by Alexander Eiler, Laurent Fontaine and Jing Wei.
 
@@ -18,3 +17,9 @@ This Code is subject to the terms of the MIT License.
 
 ## Project status
 Results from this project have been submitted to a peer-reviewed scientifc journal.
+
+## Folders and code
+The analyses code is divided into two folders "metags" and "rRNA_amplicons" representing the code to analyze whole shotgun metagenomic and SSU rRNA gene amplicon data, respectively.
+
+### metadata.R
+This represents the R code to perform the statistical analysis and data visualization on the metadata such as nutrient and gas concentrations along the chronosequences.
