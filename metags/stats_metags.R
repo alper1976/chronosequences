@@ -1,5 +1,5 @@
-### This is an R script to analyse to infer greenhouse gas emissions and metagenomic
-### data from Svalbard
+### This is an R script to infer relationships between greenhouse gas emissions and metagenomic
+### data from Svalbard and Finse
 
 
 ## saga
@@ -31,23 +31,6 @@ if (!require("caret", quietly = TRUE)){
   install.packages("caret")
   library(caret)
 }
-
-# if (!requireNamespace("BiocManager", quietly = TRUE))
-#     install.packages("BiocManager")
-
-#if (!require("Deseq2")) {
-#  BiocManager::install("DESeq2", lib="/cluster/projects/nn9745k/Rpackages_4_0_0")
-   library(DESeq2)
-#}
-#if (!require("Deseq2")) {
-#  BiocManager::install("phyloseq", lib="/cluster/projects/nn9745k/Rpackages_4_0_0")
-   library(phyloseq)
-#}
-
-# if (!require("gratia")) {
-#   install.packages("gratia", dependencies = TRUE)
-#   library(gratia)
-# }
 if (!require("stringr", quietly = TRUE)){
 	install.packages("stringr")
 	library(stringr)
@@ -105,13 +88,6 @@ color_palette_euk = c("#D1BBD7", "#AE76A3", "#882E72", "#1965B0",
                         "#E8601C", "#DC050C", "#72190E")
 
 ## LOAD VARIABLES
-#######################################################
-## Load metagenome read stats and summarize
-
-
-
-
-#######################################################
 # load metagenome tables (KEGG, pfams, COGs)
 
 
@@ -132,7 +108,7 @@ cno_pfam_table = read.table(file = file.path(figs_dir, "cno_pfam_table.csv"),
 cno_pfam_table = cno_pfam_table[,2:30]
 colnames(cno_pfam_table)[[2]] = "FI003"
 
-# load metadata ## NEEDS FIXING
+# load metadata 
 cls <- c("sample_id" = "factor",
 		 "sample_name" = "factor",
 		 "sample_date" = "factor",
@@ -163,25 +139,15 @@ cls <- c("sample_id" = "factor",
      "CH4_sat" = "numeric",
      "N2O_sat" = "numeric")
 
-metadata = read.csv(file.path("/cluster/projects/nn9745k/jing/scripts/metadata/svfi19.tsv"), header=T, check.names=FALSE, sep = "\t", stringsAsFactors=FALSE,colClasses=cls)
-
+metadata = read.csv(file.path("/cluster/projects/nn9745k/jing/scripts/metadata/svfi19.tsv"), header=T, 
+		    check.names=FALSE, sep = "\t", stringsAsFactors=FALSE,colClasses=cls)
 metadata_1 = metadata[,c(7, 10, 12:15, 17:33)]
-
 scaled_metadata = scale(metadata_1)
-
 
 ## Parse data
 rownames(scaled_metadata) = metadata$sample_id
 
-
-## merge metagenome tables
-
-## get metadata for metagenomes
-
-
-
-
-# rarefaction curves to check where to set cutoff for sequence reads
+# rarefaction curves to check coverage of KEGGs
 tpm_kegg_table_int = round(tpm_kegg_table)
 tpm_kegg_table_int[is.na(tpm_kegg_table_int)] <- 0
 cairo_ps(file.path(figs_dir, "rarefaction_curves_kegg_tpm.eps"), width=80/25.4, height=80/25.4, pointsize = 4, bg = FALSE, fallback_resolution = 300)
@@ -204,9 +170,9 @@ cairo_ps(file.path(figs_dir, "rarefaction_curves_pfam_tpm.eps"), width=80/25.4, 
                       cex.axis = 1.5)
 dev.off()
 
+# get sample sums
 colSums(tpm_kegg_table_int)
 colSums(tpm_pfam_table_int)
-
 
 ## based on rarefaction curves cutoffs for tpms were set.
 
@@ -267,9 +233,6 @@ otu_pfam_stand = decostand(otu_pfam, MARGIN = 1, method="hellinger")
 mds_pfam = vegan::metaMDS(t(otu_pfam_stand), distance = "bray", autotransform = FALSE, try = 1000)
 mds_pfam_scores = data.frame(vegan::scores(mds_pfam))
 
-
-
-
 # envfit
 # kegg
 scaled_metadata_kegg = scaled_metadata[rownames(scaled_metadata) %in% colnames(otu_kegg_stand), ]
@@ -309,19 +272,19 @@ nmds_kegg <- p + geom_text(data = mds_kegg_scores, aes(x = x, y = y, label = row
         axis.text.y = element_blank(), legend.position = "none")
 
 
-# kegg_heatmap_row <- pheatmap(data.matrix(otu_kegg),
-#                             #dendrogram = "row",
-#                             xlab = "", ylab = "",
-#                             clustering_distance_col = "correlation",
-#                             clustering_distance_row = "canberra",
-#                             main = "",
-#                             scale = "none",
-#                             cutree_rows = 7
-#                             )
-#
-# cairo_ps(file.path(figs_dir, "heatmap_kegg.eps"), width=80/25.4, height=80/25.4, # pointsize = 4, bg = FALSE, fallback_resolution = 300)
-#   kegg_heatmap_row
-# dev.off()
+kegg_heatmap_row <- pheatmap(data.matrix(otu_kegg),
+                            #dendrogram = "row",
+                            xlab = "", ylab = "",
+                            clustering_distance_col = "correlation",
+                            clustering_distance_row = "canberra",
+                            main = "",
+                            scale = "none",
+                            cutree_rows = 7
+                            )
+
+cairo_ps(file.path(figs_dir, "heatmap_kegg.eps"), width=80/25.4, height=80/25.4, # pointsize = 4, bg = FALSE, fallback_resolution = 300)
+  kegg_heatmap_row
+dev.off()
 
 # pfam
 names(mds_pfam_scores)[c(1, 2)] <- c("x", "y")
@@ -351,16 +314,9 @@ cairo_ps(file.path(figs_dir, "nmds_pfam.eps"), width=80/25.4, height=80/25.4, po
   nmds_pfam
 dev.off()
 
-
-# RDA on pathways
-
-
-
-# procrustes test between pfam and kegg tables
-
+# procrustes test between pfam and kegg tables to obtain covariation
 pro <- procrustes(X = mds_kegg, Y = mds_pfam, symmetric = FALSE)
 pro
-
 protest(X = mds_kegg, Y = mds_pfam, scores = "sites", permutations = 999)
 
 ################## mvabund + gllvm #######################
