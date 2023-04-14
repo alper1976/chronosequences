@@ -128,7 +128,7 @@ colnames(kegg_contigs) = c("Contig.ID", "besthit", "bestaver")
 kegg_contigs$Contig.ID = sub("^([^_]*_[^_]*).*", "\\1", kegg_contigs$Contig.ID)
 
 
-# load metadata ## NEEDS FIXING
+# load metadata 
 cls <- c("sample_id" = "factor",
 		 "sample_name" = "factor",
 		 "sample_date" = "factor",
@@ -163,6 +163,7 @@ metadata = read.csv(file.path("/cluster/home/alexaei/figs", "svfi19.tsv"),
   header=T, check.names=FALSE, sep = "\t", stringsAsFactors=FALSE,colClasses=cls)
 rownames(metadata) = metadata$sample_id
 
+# subset and scale metadata
 metadata_1 = metadata[,c(7, 10, 12:15, 17:33)]
 
 scaled_metadata = scale(metadata_1)
@@ -177,36 +178,29 @@ nrow(checkm[checkm$Completeness > 70,])
 nrow(checkm[checkm$Contamination < 5,])
 nrow(checkm[checkm$Strain_heterogeneity < 1,])
 
-# good_bins = checkm[checkm$Completeness > 70 & checkm$Contamination < 5,]
-
+## extract some bin and contigs tables
+good_bins = checkm[checkm$Completeness > 70 & checkm$Contamination < 5,]
 compl_bintable = bintable[complete.cases(bintable),]
-
-
 good_bintable = compl_bintable[compl_bintable$Completeness > 70 & compl_bintable$Contamination < 5,]
-
 good_contigtable = contigtable[contigtable$"Bin.ID" %in% good_bintable$Bin.ID,]
-
 good_kegg_contigs = kegg_contigs[kegg_contigs$Contig.ID %in% good_contigtable$Contig.ID,]
 
-# intres_bins = checkm[checkm$Completeness > 30 & checkm$Contamination < 5,]
-
+intres_bins = checkm[checkm$Completeness > 30 & checkm$Contamination < 5,]
 intres_bintable = compl_bintable[compl_bintable$Completeness > 50 & compl_bintable$Contamination < 5,]
-
 intres_contigtable = contigtable[contigtable$"Bin.ID" %in% intres_bintable$Bin.ID,]
-
 intres_kegg_contigs = kegg_contigs[kegg_contigs$Contig.ID %in% intres_contigtable$Contig.ID,]
 
-# bin stats
+# extract some bin statistics
 selection = seq(12, 68, by = 2)
-
 bins_coverage_per_sample = colSums(intres_bintable[,1+selection])/10000
 bin_coverage = rowSums(intres_bintable[,1+selection])/10000/length(selection)
 names(bin_coverage) = intres_bintable$Bin.ID
 
 intres_bintable_stats = cbind(intres_bintable[,c(1,3:11)],bin_coverage)
-write.table(intres_bintable_stats, file.path("/cluster/home/alexaei/figs", "intres_bintable_stats.csv"), sep = "\t", row.names = FALSE)
+write.table(intres_bintable_stats, file.path("/cluster/home/alexaei/figs", "intres_bintable_stats.csv"), 
+	    sep = "\t", row.names = FALSE)
 
-# KEGG
+# set up list of KEGGs used for identifying specific traits
 
 most_interesting_kegg = c("K00855", # phosphoribulokinase                           Carbon fixation
                           "K01602", # RuBisCO small chain                           Carbon fixation
@@ -384,30 +378,24 @@ most_interesting_kegg = c("K00855", # phosphoribulokinase                       
                           "K22015"    # fdhF; formate dehydrogenase (hydrogenase)
 
                           )
-# most important KEGGs analysis
+
+## KEGGs analysis to identify traits
 kegg_selection = good_kegg_contigs[good_kegg_contigs$besthit %in% most_interesting_kegg,]
-
 contigtable_kegg_selection = good_contigtable[good_contigtable$Contig.ID %in% kegg_selection$Contig.ID, ]
-
 bin_kegg_selection = join(contigtable_kegg_selection, kegg_selection, type="full", by = "Contig.ID")
-
 bin_kegg_selection$avTPM = rowMeans(bin_kegg_selection[,seq(6, 93, by = 3)])
 
-write.table(bin_kegg_selection, file.path("/cluster/projects/nn9745k/jing/02_results/svalbard", "bin_kegg_selection.csv"), sep = "\t", row.names = FALSE)
-
-# interesting part
+write.table(bin_kegg_selection, file.path("/cluster/projects/nn9745k/jing/02_results/svalbard", "bin_kegg_selection.csv"), 
+	    sep = "\t", row.names = FALSE)
 
 intres_kegg_selection = intres_kegg_contigs[intres_kegg_contigs$besthit %in% most_interesting_kegg,]
-
 intres_contigtable_kegg_selection = intres_contigtable[intres_contigtable$Contig.ID %in% intres_kegg_selection$Contig.ID, ]
-
 intres_bin_kegg_selection = join(intres_contigtable_kegg_selection, intres_kegg_selection, type="full", by = "Contig.ID")
-
 intres_bin_kegg_selection$avTPM = rowMeans(intres_bin_kegg_selection[,seq(6, 93, by = 3)])
 colSums(intres_bin_kegg_selection[,seq(6, 93, by = 3)])
 
 
-
+# set up list of KEGGs hydrolases traits and run analysis
 hydrolases =  c("K01187", # glycoside hydrolase family 31 protein         Glycoside hydrolases
                 "K01199", # glycoside hydrolase family 31 protein         Glycoside hydrolases
                 "K01210", # glycoside hydrolase family 31 protein         Glycoside hydrolases
@@ -422,15 +410,13 @@ hydrolases =  c("K01187", # glycoside hydrolase family 31 protein         Glycos
                 "K01182", # glycoside hydrolase family 31 protein         Glycoside hydrolases
                 "K01194"  # glycoside hydrolase family 31 protein         Glycoside hydrolases
                 )
+
 intres_kegg_hydrolases = intres_kegg_contigs[intres_kegg_contigs$besthit %in% hydrolases,]
-
 intres_contigtable_hydrolases = intres_contigtable[intres_contigtable$Contig.ID %in% intres_kegg_hydrolases$Contig.ID, ]
-
 intres_bin_hydrolases = join(intres_contigtable_hydrolases, intres_kegg_hydrolases, type="full", by = "Contig.ID")
-
 intres_bin_hydrolases$avTPM = rowMeans(intres_bin_hydrolases[,seq(6, 93, by = 3)])
 
-
+# set up list of KEGGs methanotrophy and run analysis
 methanotroph =  c("K10944",   # pmoA; ammonia/methane monooxygenase component A
                   "K10945",   # pmoB; ammonia/methane monooxygenase component B
                   "K10946",   # pmoC; ammonia/methane monooxygenase component C
@@ -466,18 +452,12 @@ methanotroph =  c("K10944",   # pmoA; ammonia/methane monooxygenase component A
                   )
 
 intres_kegg_methanotroph = intres_kegg_contigs[intres_kegg_contigs$besthit %in% methanotroph,]
-
 intres_contigtable_methanotroph = intres_contigtable[intres_contigtable$Contig.ID %in% intres_kegg_methanotroph$Contig.ID, ]
-
 intres_bin_methanotroph = join(intres_contigtable_methanotroph, intres_kegg_methanotroph, type="full", by = "Contig.ID")
-
 intres_bin_methanotroph$avTPM = rowMeans(intres_bin_methanotroph[,seq(6, 93, by = 3)])
 
+#### PLOT KEGG SELECTION PER BIN ####
 
-
-# PLOT KEGG SELECTION PER BIN
-
-# cairo_ps(file.path("/cluster/projects/nn9745k/jing/02_results/svalbard", "bin_kegg.eps"), width=80/25.4, height=80/25.4,
 cairo_ps(file.path("/cluster/home/alexaei/figs", "bin_kegg.eps"), width=80/25.4, height=80/25.4,
   pointsize = 4, bg = FALSE, fallback_resolution = 300)
   ggplot(bin_kegg_selection, aes(Bin.ID, besthit, fill= avTPM)) +
@@ -490,8 +470,6 @@ cairo_ps(file.path("/cluster/home/alexaei/figs", "bin_kegg.eps"), width=80/25.4,
     axis.line.x = element_line(color = "grey")) +
   scale_fill_distiller(palette = "RdPu") +
   geom_tile()
-
-
 dev.off()
 
 # KEGG pathways
@@ -542,7 +520,7 @@ summarize_kegg_traits = function(kegg_selection){
                           nrow=length(traits_name),
                           dimnames=list(traits_name, colnames(kegg_selection))))
 
-  # Calculate
+  # Calculate trait distribution
   Carbon_fixation = colSums(kegg_selection["K00855",] + kegg_selection["K01602",], na.rm = TRUE)/2
   trait_table["Carbon_fixation",] = Carbon_fixation
 
