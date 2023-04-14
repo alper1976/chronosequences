@@ -90,16 +90,7 @@ color_palette_euk = c("#D1BBD7", "#AE76A3", "#882E72", "#1965B0",
                         "#CAE0AB", "#F7F056", "#F6C141", "#F1932D",
                         "#E8601C", "#DC050C", "#72190E")
 
-## LOAD VARIABLES
-#######################################################
-## Load metagenome read stats and summarize
-
-
-
-
-#######################################################
-# load data
-
+## LOAD DATA
 
 checkm = read.table(file = file.path(path_in, "17.coassembled.checkM"),
   sep = "\t", header = FALSE, fill = TRUE)
@@ -131,12 +122,6 @@ metacyc_tax = read.table(file = file.path(path_in, "metacyc_tax.txt"), check.nam
   sep = "\n")
 intres_metacyc_tax = read.table(file = file.path(path_in, "interes_metacyc.txt"), check.names = FALSE, header = FALSE,
   sep = "\n")
-
-
-# metacyc_pathways = read.table(file = file.path(path_in, "20.coassembled.metacyc.pathways"), check.names = FALSE,
-#  sep = "\t")
-# coassembled_stats = read.table(file = file.path(path_in, "21.coassembled.stats"),
-#  sep = "\t")
 
 kegg_contigs = read.table(file = file.path(path_in, "results/07.coassembled.fun3.kegg"), sep = "\t")
 colnames(kegg_contigs) = c("Contig.ID", "besthit", "bestaver")
@@ -892,9 +877,9 @@ lakes_550 = data_ht2[,metadata4$gl_dist<551]
 lakes_3300 = data_ht2[,metadata4$gl_dist>551 & metadata4$gl_dist<3300]
 lakes_10000 = data_ht2[,metadata4$gl_dist>3300]
 
-.boxplot1 = anno_boxplot(lakes_550, which = "row")
-.boxplot2 = anno_boxplot(lakes_3300, which = "row")
-.boxplot3 = anno_boxplot(lakes_10000, which = "row")
+.boxplot1 = anno_boxplot(lakes_550, which = "row", outine = FALSE) # log = "y" or ylim = c(0,5)
+.boxplot2 = anno_boxplot(lakes_3300, which = "row", outine = FALSE)
+.boxplot3 = anno_boxplot(lakes_10000, which = "row", outine = FALSE)
 
 ha_mix_right1 = HeatmapAnnotation(bxplt = .boxplot1,
                               which = "row", width = unit(2, "cm"))
