@@ -1,4 +1,4 @@
-### This is an R script to analyse to infer greenhouse gas emissions and metagenomic
+### This is an R script to analyse to infer greenhouse gas emissions and metabarcoding
 ### data from Svalbard
 
 
