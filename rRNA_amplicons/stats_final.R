@@ -1407,4 +1407,4 @@ comp_sig_comp2 = comp_comp2[comp_comp2$adj.P.Val < 0.05, ]
 
 cont_comp_sig_comp = (nrow(comp_sig_comp1)+nrow(comp_sig_comp2))/(nrow(comp_comp1)+nrow(comp_comp2))
 
-
+save.image(file=file.path(figs_dir, "stats.RData"))
