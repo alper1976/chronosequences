@@ -22,10 +22,6 @@ figs_dir <- file.path(path_out, "figs")
 
 ## LOAD PACKAGES
 
-# if (!require("gratia")) {
-#   install.packages("gratia", dependencies = TRUE)
-#   library(gratia)
-# }
 if (!require("phyloseq", quietly = TRUE)){
 	BiocManager::install("phyloseq")
 	library(phyloseq)
@@ -70,10 +66,6 @@ if (!require("sp")) {
   install.packages("sp", dependencies = TRUE)
   library(sp)
 }
-# if (!require("RcmdrMisc")) {
-#   install.packages("RcmdrMisc", dependencies = TRUE)
-#   library(RcmdrMisc)
-# }
 if (!require("visreg")) {
   install.packages("visreg", dependencies = TRUE)
   library(visreg)
@@ -216,7 +208,6 @@ scaled_metadata = scale(sample_metadata )
 corr_spearman = rcorr(as.matrix(scaled_metadata), type = "spearman")
 
 # get Holm's adjusted p-value
-
 corr_spearman_adjusted = print_rcorr_adjust(rcorr.adjust(scaled_metadata, type = "spearman",
                                               use = "pairwise.complete.obs"))
 
@@ -231,9 +222,6 @@ dev.off()
 postscript(file.path(figs_dir, "correlation_matrix_metadata.eps"), width=80/25.4, height=80/25.4, pointsize = 4, bg = FALSE)
   corrplot::corrplot(corr_spearman$r, type="upper", p.mat = corr_spearman$P, sig.level = 0.05, insig="blank", order="hclust", addrect=2)
 dev.off()
-
-
-# autocorrelation environmental variables in metadata
 
 # rarefaction curves to check where to set cutoff for sequence reads
 cairo_ps(file.path(figs_dir, "rarefaction_curves_euk.eps"), width=80/25.4, height=80/25.4, pointsize = 4, bg = FALSE, fallback_resolution = 300)
@@ -314,10 +302,7 @@ diversity_metadata = cbind(richness_bac, richness_euk, scaled_metadata)
 
 corr_spearman <- rcorr(as.matrix(diversity_metadata), type = "spearman")
 
-
-
 # get Holm's adjusted p-value
-
 corr_spearman_adjusted = print_rcorr_adjust(rcorr.adjust(diversity_metadata, type = "spearman",
                                               use = "pairwise.complete.obs"))
 
@@ -325,7 +310,6 @@ df_1 = dplyr::mutate_all(as.data.frame(corr_spearman_adjusted, stringsAsFactors 
         function(x) as.numeric(as.character(x)))
 df_1[is.na(df_1)] = 0.0001
 df_2 = as.matrix(df_1)
-
 
 postscript(file.path(figs_dir, "correlation_matrix_diversity_adjusted.eps"), width=80/25.4, height=80/25.4, pointsize = 4, bg = FALSE)
   corrplot::corrplot(corr_spearman$r, type="upper", p.mat = df_2, sig.level = 0.05, insig="blank", order="hclust", addrect=2)
@@ -342,7 +326,6 @@ independent_variables = scale(sample_metadata[c(1:5,10:29),c(1:3, 5, 7:9, 11,13,
 dependent_variables = richness_euk[c(1:5,10:29),c("ACE_euk", "Simpson_euk")]
 
 pls2_reg_euk = plsreg2(independent_variables[5:nrow(independent_variables),], dependent_variables[5:nrow(dependent_variables),], comps=5, crosval=TRUE)
-
 summary(pls2_reg_euk)
 
 pls2_reg_euk$expvar
@@ -366,11 +349,9 @@ cairo_ps(file.path(figs_dir, "PLS_diversity_euk.eps"), width=80/25.4, height=80/
 dev.off()
 
 # Bacteria
-
 dependent_variables = richness_bac[c(1:5,10:29),c("ACE_bac", "Simpson_bac")]
 
 pls2_reg_bac = plsreg2(independent_variables[5:nrow(independent_variables),], dependent_variables[5:nrow(dependent_variables),], comps=5, crosval=TRUE)
-
 summary(pls2_reg_bac)
 
 pls2_reg_bac$expvar
@@ -445,7 +426,6 @@ combine_vip_coef <- vip_bac_comp1 %>%
                                       "N2O", "bird", "CO2_sat", "CH4_sat", "N2O_sat")
                                       ))
 
-
 p1_vip <-
   ggplot(combine_vip_coef, aes(x = variables,  y = VIP, group =1))+
   geom_bar(stat="identity",  fill = "black") +
@@ -495,7 +475,6 @@ colnames(df_coef)[1] <- "regression_coefficients"
 df_coef  <- df_coef[, -c(2)]
 
 # VIP
-
 VIP <- function(object) {
   if (object$method != "oscorespls")
     stop("Only implemented for orthogonal scores algorithm.  Refit with 'method = \"oscorespls\"'")
@@ -507,7 +486,6 @@ VIP <- function(object) {
   SSW <- sweep(object$loading.weights^2, 2, SS / Wnorm2, "*")
   sqrt(nrow(SSW) * apply(SSW, 1, cumsum) / cumsum(SS))
 }
-
 
 vip_euk <- as.data.frame(VIP(df_plsr))
 vip_euk_comp1 <- vip_euk[1, ]
@@ -572,10 +550,7 @@ dist_level = rep(diversity_metadata$dist_level, 3)
 
 gasses <- data.frame(log(gas_conc), gas, dist_level)
 
-
-
 cairo_ps(file.path(figs_dir, "boxplot_gasses.eps"), width=80/25.4, height=80/25.4, pointsize = 4, bg = FALSE, fallback_resolution = 300)
-
 ggplot(gasses, aes(x = gas, y = gas_conc,
                colour = gas,
                shape = dist_level)) +
@@ -583,12 +558,9 @@ ggplot(gasses, aes(x = gas, y = gas_conc,
   geom_jitter() +
   scale_y_continuous(trans='log10') +
   theme_bw()
-
-
 dev.off()
 
 cairo_ps(file.path(figs_dir, "boxplot_gasses_dist.eps"), width=80/25.4, height=80/25.4, pointsize = 4, bg = FALSE, fallback_resolution = 300)
-
 ggplot(gasses, aes(x = gas, y = gas_conc,
                colour = gas,
                shape = dist_level)) +
@@ -597,12 +569,9 @@ ggplot(gasses, aes(x = gas, y = gas_conc,
   scale_y_continuous(trans='log10') +
   theme_bw() + 
   theme(legend.position="none")
-
-
 dev.off()
 
-# GAMs
-
+## GAMs
 # CO2
 summary(co2m1 <- gam(CO2 ~ s(TN) + s(TOC),
                     select=TRUE, data=data.frame(diversity_metadata[c(1:5, 10:29),])))
@@ -649,7 +618,6 @@ o2 <- plot( sm(co2sm1, 2) ) +
     l_ciLine(mul = 5, colour = "blue", linetype = 2) +
     l_points(shape = 19, size = 1, alpha = 0.1) + theme_bw()
 
-
 cairo_ps(file.path(figs_dir, "co2sm1_plotsTN.eps"), width=80/25.4, height=80/25.4, pointsize = 4, bg = FALSE, fallback_resolution = 300)
 o1
 dev.off()
@@ -660,10 +628,7 @@ cairo_ps(file.path(figs_dir, "co2sm1_appraise.eps"), width=240/25.4, height=240/
   appraise(co2sm1)
 dev.off()
 
-
-
 # CH4
-
 summary(ch4m1 <- gam(CH4 ~ s(TN) + s(DOC),
                     select=TRUE, data=diversity_metadata))
 summary(ch4sm1 <- gam(CH4_sat ~ s(TN) + s(DOC),
@@ -674,7 +639,6 @@ summary(ch4m2 <- gam(CH4 ~ s(gl_dist) + s(DOC),
                     select=TRUE, data=diversity_metadata))
 summary(ch4sm2 <- gam(CH4_sat ~ s(gl_dist) + s(TOC),
                     select=TRUE, data=diversity_metadata))
-
 
 ch4sm1 <- getViz(ch4sm1)
 
@@ -687,7 +651,6 @@ o2 <- plot( sm(ch4sm1, 2) ) +
     l_ciLine(mul = 5, colour = "blue", linetype = 2) +
     l_points(shape = 19, size = 1, alpha = 0.1) + theme_bw()
 
-
 cairo_ps(file.path(figs_dir, "ch4sm1_plotsTN.eps"), width=80/25.4, height=80/25.4, pointsize = 4, bg = FALSE, fallback_resolution = 300)
 o1
 dev.off()
@@ -697,7 +660,6 @@ dev.off()
 cairo_ps(file.path(figs_dir, "ch4sm1_appraise.eps"), width=240/25.4, height=240/25.4, pointsize = 4, bg = FALSE, fallback_resolution = 300)
   appraise(ch4sm1)
 dev.off()
-
 
 summary(ch4sm1 <- gam(CH4_sat ~ s(TN) + s(DOC),
                     select=TRUE, data=diversity_metadata))
@@ -719,7 +681,6 @@ cairo_ps(file.path(figs_dir, "ch4m2_appraise.eps"), width=240/25.4, height=240/2
   appraise(ch4m1)
 dev.off()
 
-
 summary(ch4sm3 <- gam(CH4 ~ s(gl_dist) + s(DOC),
                     select=TRUE, data=diversity_metadata))
 
@@ -729,7 +690,6 @@ summary(ch4m3 <- gam(CH4 ~ s(TN),
                     select=TRUE, data=diversity_metadata))
 summary(ch4m4 <- gam(CH4 ~ s(ACE_bac),
                     select=TRUE, data=diversity_metadata))
-
 
 summary(ch4m5 <- lm(CH4 ~ scale(gl_dist),
                     select=TRUE, data=diversity_metadata))
@@ -744,7 +704,6 @@ cairo_ps(file.path(figs_dir, "ch4m4_plotACE.eps"), width=80/25.4, height=80/25.4
 o1
 dev.off()
 
-
 # N2O
 summary(n2o1 <- gam(N2O_sat ~ s(ACE_bac),
                     select=TRUE, data=diversity_metadata))
@@ -754,7 +713,6 @@ summary(n2o3 <- gam(N2O_sat ~ s(TN) + s(DOC),
                     select=TRUE, data=diversity_metadata))
 summary(n2o4 <- gam(N2O_sat ~ s(ACE_bac) + s(TN),
                     select=TRUE, data=diversity_metadata))
-
 
 cairo_ps(file.path(figs_dir, "n2o3_appraise.eps"), width=80/25.4, height=80/25.4, pointsize = 4, bg = FALSE, fallback_resolution = 300)
   appraise(n2o3)
@@ -769,21 +727,17 @@ cairo_ps(file.path(figs_dir, "n2o3_draw.eps"), width=80/25.4, height=80/25.4, po
   o1
 dev.off()
 
-# Bacterial cell counts and GHG saturation stats
-
+## Bacterial cell counts and GHG saturation stats
 summary(metadata)
 summary(metadata[which(metadata$gl_dist <= 550),])
 summary(metadata[which(metadata$gl_dist >= 3350),])
 apply(metadata[which(metadata$gl_dist <= 550),], 2, sd, na.rm = TRUE)
 apply(metadata[which(metadata$gl_dist >= 3350),], 2, sd, na.rm = TRUE)
 
-# Bacterial cell counts
-
-
+## Alpha diversity
 # ACE
 summary(m2b <- gam(ACE_bac ~ s(TN) + s(gl_dist),
                     select=TRUE, data=diversity_metadata))
-
 
 # Simpson
 summary(m2b <- gam(Simpson_euk ~ s(TN) + as.factor(bird),
@@ -793,9 +747,7 @@ summary(m2b <- gam(Simpson_euk ~ s(TN),
 summary(m2b <- gam(Simpson_euk ~ s(DOC),
                     select=TRUE, data=diversity_metadata))
 
-
-
-# beta diversity
+## beta diversity
 # NMDS - grouping of samples
 # Eukaryota
 otu_euk <- otu_table(rarefied_euk)
@@ -814,7 +766,6 @@ mds_euk_scores$sites <- rownames(mds_euk_scores)
 names(mds_euk_scores)[c(1, 2)] <- c("x", "y")
 mds_euk_scores$z <- NA
 
-
 euk_ordisurf <- ordisurf(mds_euk ~ euk_meta$"gl_dist", plot = FALSE, scaling = 3)
 head(euk_ordisurf)
 
@@ -822,8 +773,6 @@ contour_vals <- extract.xyz(obj = euk_ordisurf)
 head(contour_vals)
 
 p <- ggplot(data = contour_vals, aes(x, y, z = z)) + stat_contour(aes(colour = ..level..)) + theme_bw()
-
-
 nmds_euk <- p + geom_text(data = mds_euk_scores, aes(x = x, y = y, label = rownames(mds_euk_scores)),
     colour = "red") + coord_equal() + theme_bw() + labs(x = "NMDS1", y = "NMDS2") +
     theme(panel.border = element_rect(fill = NA), axis.text.x = element_blank(),
@@ -837,17 +786,14 @@ saveRDS(otu_bac_stand, file = file.path(figs_dir, "otu_bac_stand.rds"))
 
 otu_bac_dist = vegdist(t(otu_bac_stand), method = "bray")
 # saveRDS(otu_bac_dist, file = file.path(figs_dir, "otu_bac_dist.rds"))
-
 bac_meta <- sample_data(rarefied_bac)
 
 mds_bac = vegan::metaMDS(t(otu_bac_stand), distance = "bray", autotransform = FALSE, try = 1000)
 # saveRDS(mds_bac, file = file.path(figs_dir, "mds_bac.rds"))
-
 mds_bac_scores = data.frame(vegan::scores(mds_bac))
 mds_bac_scores$sites <- rownames(mds_bac_scores)
 names(mds_bac_scores)[c(1, 2)] <- c("x", "y")
 mds_bac_scores$z <- NA
-
 
 bac_ordisurf <- ordisurf(mds_bac ~ bac_meta$"gl_dist", plot = FALSE, scaling = 3)
 head(bac_ordisurf)
@@ -865,7 +811,6 @@ nmds_bac <- p + geom_text(data = mds_bac_scores, aes(x = x, y = y, label = rowna
         axis.text.y = element_blank(), legend.position = "none")
 
 # NMDS plot - plot distance from glacier in color and the 4 localities with symbols
-
 cairo_ps(file.path(figs_dir, "nmds_euk.eps"), width=80/25.4, height=80/25.4, pointsize = 4, bg = FALSE, fallback_resolution = 300)
   nmds_euk
 dev.off()
@@ -874,8 +819,7 @@ cairo_ps(file.path(figs_dir, "nmds_bac.eps"), width=80/25.4, height=80/25.4, poi
   nmds_bac
 dev.off()
 
-
-# RDA and envfit
+## RDA and envfit
 # Eukaryota
 otu_euk_stand_subset = otu_euk_stand[,5:ncol(otu_euk_stand)]
 mds_euk_subset = vegan::metaMDS(t(otu_euk_stand_subset), distance = "bray", autotransform = FALSE, try = 1000)
@@ -909,13 +853,9 @@ ggplot(tmp, aes(x = Domain, y = env_var)) +
   theme_bw()
 dev.off()
 
-################## analys genera distribution ######################
-
-
-
-
 ################## mvabund + gllvm #######################
-
+# analyis of single ASVs and their distribution along the environmental gradients
+			 
 otu_euk_mva <- mvabund(otu_euk)
 rownames(otu_bac) <-
 otu_bac_mva <- mvabund(otu_bac)
@@ -1016,8 +956,8 @@ for(i in 1:5){
   names(criterias)[i + 1] = i
 }
 
-# procrustes test
-
+######## procrustes test ##########
+# relationship between bacterial and eukaryotic beta diversity			
 pro <- procrustes(X = mds_euk_subset, Y = mds_bac_subset, symmetric = FALSE)
 pro
 
@@ -1031,8 +971,7 @@ dist_euk_subset = vegan::vegdist(t(otu_euk), method = "bray")
 mantel(dist_euk_subset, dist_bac_subset, method = "spearman", permutations = 9999, na.rm = TRUE)
 
 
-
-# taxonomic composition
+############## taxonomic composition ##################
 # Eukaryotes
 # BARPLOT - taxonomic composition
 
@@ -1151,7 +1090,7 @@ svg(file.path(figs_dir, "boxplot_genera_euk.svg"), width=120/25.4, height=160/25
      )
 dev.off()
 
-## RDA
+## RDA on taxonomic diversity
 
 metadata4 = data.frame(sample_data(classGlom))
 metadata4 = metadata4[,c("gl_dist", "Temp", "TOC", "DN", "bird")]
@@ -1213,7 +1152,6 @@ tax_matrix = as(tax_table(classGlom), 'matrix')
 rownames(taxon_table) = tax_matrix[,taxonomy]
 tax_table = prop.table(taxon_table, margin = 2)*100
 
-
 # methanotrophs
 methanotrophs = c("Methylibium",
                   "Methylacidimicrobium",
@@ -1273,8 +1211,6 @@ svg(file.path(figs_dir, "boxplot_methanotrophs.svg"), width=120/25.4, height=160
 dev.off()
 
 #genera
-
-
 tax_table <- tax_table[order(rowSums(-taxon_table)),]
 rowSums(taxon_table)
 dim(taxon_table)
@@ -1308,7 +1244,6 @@ dev.off()
 
 
 ## fecal indicators
-
 taxonomy = "Family"
 classGlom = tax_glom(rarefied_bac, taxrank = taxonomy)
 
@@ -1331,19 +1266,18 @@ fecal_meta = fecal_meta[,c(28, 34, 35)]
 fecal_spearman = rcorr.adjust(as.matrix(fecal_meta), type = "spearman")
 
 
-# gl_dist
+# identify ASVs that show trends with gl_dist - distance to glacier
 # extract ASVs with confidence interval > 2 or < -2
 
 fit_sign_split_gl_dist1 = fit_sign_split[fit_sign_split[,1]>=2,]
 fit_sign_split_gl_dist2 = fit_sign_split[fit_sign_split[,2]<=-2,]
 fit_sign_split_gl_dist = rbind(fit_sign_split_gl_dist1,fit_sign_split_gl_dist2)
 
-# check tax assignment
-
+# check taxonomic assignment
 tax_bac_gl_dist1 = tax_bac[rownames(tax_bac) %in% rownames(fit_sign_split_gl_dist1),]
 tax_bac_gl_dist2 = tax_bac[rownames(tax_bac) %in% rownames(fit_sign_split_gl_dist2),]
 
-# DN
+# identify ASVs that show trends with DN - dissolved nitrogen or more generl with nutrient status
 fit_sign_bac_DN1 = fit_sign_split[fit_sign_split[,3]>=2,]
 fit_sign_bac_DN2 = fit_sign_split[fit_sign_split[,4]<=-2,]
 
@@ -1358,7 +1292,6 @@ tax_bac_DOC2 = tax_bac[rownames(tax_bac) %in% rownames(fit_sign_bac_DOC2),]
 
 
 ## Eukaryotes
-
 fit_euk_confin = confint(fit_env_euk, level = 0.95, parm = "Xcoef")
 
 
@@ -1392,134 +1325,7 @@ fit_sign_euk_DOC2 = fit_sign_split_euk[fit_sign_split_euk[,6]<=-2,]
 tax_euk_DOC1 = tax_euk[rownames(tax_euk) %in% rownames(fit_sign_euk_DOC1),]
 tax_euk_DOC2 = tax_euk[rownames(tax_euk) %in% rownames(fit_sign_euk_DOC2),]
 
-# make heatmap with important pathways
-# sort samples according with distance to glacier
-
-# make heatmap using clustering method
-
-
-# sum them up to see some stats
-
-
-## RDA
-metadata_pathways = metadata[rownames(metadata) %in% colnames(pathways), ]
-metadata_pathways$bird[metadata_pathways$bird == -1] <- 0
-
-metadata_pathways = metadata_pathways[,c("gl_dist", "Temp", "TOC", "DN", "bird")]
-
-rda_pathways_meta <- vegan::rda(vegan::decostand(t(pathways[,2:ncol(pathways)]), method="hellinger"), as.matrix(metadata_pathways))
-
-rda_pathways_meta
-summary_rda_pathways_meta <- summary(rda_pathways_meta)
-RsquareAdj(rda_pathways_meta)
-
-rda_scores_env = vegan::scores(rda_pathways_meta, display = "bp")
-rda_scores_pathways = vegan::scores(rda_pathways_meta, display = "sp")
-rda_scores_samples = vegan::scores(rda_pathways_meta, display = "sites")
-
-names = pathways$pathway
-names
-
-## add colors to selected
-
-rda_plot_pathways <- ggplot2::ggplot(data.frame(rda_scores_pathways),
-                    ggplot2::aes(x = RDA1, y = RDA2, color = names)) +
-                    ggplot2::geom_point(size = 5, alpha = .5)
-
-mult = 0.2
-
-rda_biplot_pathways <- rda_plot_pathways +
-  ggplot2::geom_segment(data = data.frame(rda_scores_env), ggplot2::aes(x = 0, xend = mult * RDA1,
-                    y = 0, yend = mult * RDA2),
-                arrow = ggplot2::arrow(length = ggplot2::unit(0.25, "cm")), colour = "red", alpha = .4) +
-  ggplot2::geom_text(data = data.frame(rda_scores_env),
-            ggplot2::aes(x = mult * RDA1, y = mult * RDA2, label = rownames(rda_scores_env),
-                hjust = 0.5 * (1-sign(RDA1)), vjust = 0.5 * (1-sign(RDA2))),
-                color = "red", size = 3, alpha = .4) +
-  ggplot2::coord_cartesian(xlim = c(-0.50, 0.30), ylim = c(-0.3, 0.45)) +
-  ggplot2::theme(plot.background = ggplot2::element_rect(fill = "white"),
-                panel.background = ggplot2::element_rect(fill = "white"),
-                panel.grid = ggplot2::element_line(color = "grey"),
-                legend.position = "None")
-
-svg(file.path(figs_dir, "rda_pathways.svg"), width=80/25.4, height=80/25.4, pointsize = 6, bg = FALSE)
-  rda_biplot_pathways
-dev.off()
-
-# sites - samples
-names = rownames(rda_scores_samples)
-names
-
-
-rda_plot_pathways_samples <- ggplot2::ggplot(data.frame(rda_scores_samples),
-                    ggplot2::aes(x = RDA1, y = RDA2, color = names)) +
-                    ggplot2::geom_point(size = 5, alpha = .5) +
-                    scale_color_manual
-
-mult = 0.2
-
-rda_samples_pathways <- rda_plot_pathways_samples +
-  ggplot2::geom_segment(data = data.frame(rda_scores_env), ggplot2::aes(x = 0, xend = mult * RDA1,
-                    y = 0, yend = mult * RDA2),
-                arrow = ggplot2::arrow(length = ggplot2::unit(0.25, "cm")), colour = "red", alpha = .4) +
-  ggplot2::geom_text(data = data.frame(rda_scores_env),
-            ggplot2::aes(x = mult * RDA1, y = mult * RDA2, label = rownames(rda_scores_env),
-                hjust = 0.5 * (1-sign(RDA1)), vjust = 0.5 * (1-sign(RDA2))),
-                color = "red", size = 3, alpha = .4) +
-  ggplot2::coord_cartesian(xlim = c(-0.50, 0.30), ylim = c(-0.3, 0.45)) +
-  ggplot2::theme(plot.background = ggplot2::element_rect(fill = "white"),
-                panel.background = ggplot2::element_rect(fill = "white"),
-                panel.grid = ggplot2::element_line(color = "grey"),
-                legend.position = "None")
-
-# gllvm
-gllvm_pathway1 = gllvm::gllvm(t(pathways[,2:ncol(pathways)]), family = "negative.binomial")
-gllvm_pathway2 = gllvm::gllvm(t(pathways[,2:ncol(pathways)]), metadata_pathways[,1:4],
-                        family = "negative.binomial")
-
-cairo_ps(file.path(figs_dir, "gllvm_pathway2_eval.eps"), width=80/25.4, height=80/25.4,
-  pointsize = 4, bg = FALSE, fallback_resolution = 300)
-  par(mfrow = c(3, 2), mar = c(4, 4, 2, 1))
-  plot(gllvm_pathway2, var.colors = 1)
-dev.off()
-
-
-criterias <- NULL
-for(i in 1:5){
-  fiti_pathway <- gllvm::gllvm(t(pathways[,2:ncol(pathways)]), scale(metadata_pathways),
-                family = "negative.binomial", num.lv = i, sd.errors = FALSE,
-                formula = ~ gl_dist + DN + TOC, seed = 1234)
-  criterias[i + 1] <- summary(fiti_pathway)$AICc
-  names(criterias)[i + 1] = i
-}
-
-fit_env_pathway <- gllvm::gllvm(t(pathways[,2:ncol(pathways)]), scale(metadata_pathways),
-                      family = "negative.binomial", num.lv = 4,
-                      formula = ~ gl_dist + DN + TOC,
-                      seed = 1234)
-
-cairo_ps(file.path(figs_dir, "gllvm_pathway_coeff.eps"), width=80/25.4, height=80/25.4,
-  pointsize = 4, bg = FALSE, fallback_resolution = 300)
-  gllvm::coefplot(fit_env_pathway, cex.ylab = 0.7, mar = c(4, 9, 2, 1),
-           xlim.list = list(NULL, NULL, c(-8, 8)), mfrow=c(3,1))
-dev.off()
-
-fit_pathway_confin = confint(fit_env_pathway, level = 0.95, parm = "Xcoef")
-fit_split_pathway_confin = cbind(fit_pathway_confin[1:349,],
-                             fit_pathway_confin[350:698,],
-                             fit_pathway_confin[699:1047,])
-rownames(fit_split_pathway_confin) = pathways$pathway
-col.names = c("gl_dist_cilow", "gl_dist_ciup","DN_cilow", "DN_ciup", "TOC_cilow", "TOC_ciup")
-colnames(fit_split_pathway_confin) = col.names
-
-fit_pathway_gl_dist1 = fit_split_pathway_confin[fit_split_pathway_confin[,1]>=0.2,]
-fit_pathway_gl_dist2 = fit_split_pathway_confin[fit_split_pathway_confin[,2]<=-0.2,]
-
-chemo_pathways = fit_split_pathway_confin[rownames(fit_split_pathway_confin) %in% list_chemolitho,]
-
-# The pathway reconstruction does not seem to work on the community level
-
-# MINE analysis
+########## MINE analysis #############
 otu_bac <- otu_table(rarefied_bac)
 otu_bac <- otu_bac[rowSums(otu_bac) != 0,]
 
@@ -1537,13 +1343,9 @@ otu_euk_tax = tax_table(rarefied_euk)
 rownames(otu_bac_tax) = paste(rownames(otu_bac_tax), "B", sep = "")
 rownames(otu_euk_tax) = paste(rownames(otu_euk_tax), "E", sep = "")
 
-
-
 otu_tot_tax = rbind(otu_bac_tax[,c(1,6)], otu_euk_tax[,c(1,7)])
 
-
 otu_tot = t(rbind(otu_bac, otu_euk))
-
 otu_tot = otu_tot[, apply(otu_tot == 0, 2, sum) <= 25 ]
 
 ticenull = minerva::mictools(otu_tot, nperm=1000, p.adjust.method = "BH")
@@ -1558,7 +1360,6 @@ p_value_adj = corr_res_adj$P
 r_value = round(corr_res_adj$R$r, 4)
 
 mine_res = minerva::mine(otu_tot, alpha = 1)
-
 mine_res$MAS[upper.tri(mine_res$MAS)] <- NA
 mine_mas = reshape2::melt(mine_res$MAS, na.rm = TRUE)
 mine_res$MIC[upper.tri(mine_res$MIC)] <- NA
@@ -1605,10 +1406,5 @@ comp_comp2 = comp_comp2[comp_comp2$Var2 %like% "B",]
 comp_sig_comp2 = comp_comp2[comp_comp2$adj.P.Val < 0.05, ]
 
 cont_comp_sig_comp = (nrow(comp_sig_comp1)+nrow(comp_sig_comp2))/(nrow(comp_comp1)+nrow(comp_comp2))
-# prevalence of significant co-occurrences between the eukaryotic and bacterial kingdom 2.0%
-
-
-## Divide dataset into two groups <550m and > 3000m from glacier
-
 
 
