@@ -23,3 +23,6 @@ The analyses code is divided into two folders "metags" and "rRNA_amplicons" repr
 
 ### metadata.R
 This represents the R code to perform the statistical analysis and data visualization on the metadata such as nutrient and gas concentrations along the chronosequences.
+
+## released version 1.0.0
+https://zenodo.org/badge/latestdoi/588562152
