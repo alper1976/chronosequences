@@ -6,7 +6,7 @@ Using genomic and chemical data from freshwater chronosequences in Arctic Svalba
 
 ```
 cd path to repositories
-git clone https://gitlab.com/eiler_lab/chronosequences.git
+git clone https://github.com/alper1976/chronosequences.git
 ```
 
 ## Authors and acknowledgment
