@@ -1,6 +1,6 @@
 # chronosequences
 
-Using genomic and chemical data from freshwater chronosequences in Arctic Svalbard and Alpine Norway to study the functional and taxonomic succession of the microbiome upon glacial retreat. This repository includes slurm scripts to run Squeezemeta https://github.com/jtamames/SqueezeMeta on our system (https://documentation.sigma2.no/hpc_machines/saga.html) for metagenomic analyses (raw data processing, assmebly and annotation, and binning) as well as amplicon analysis using dada2 (https://benjjneb.github.io/dada2). Additional scripts are to perform statistics and visualization of the data in R.  
+Here we used genomic and chemical data from freshwater chronosequences in Arctic Svalbard and Alpine Norway to study the functional and taxonomic succession of the microbiome upon glacial retreat. This repository includes slurm scripts to run Squeezemeta https://github.com/jtamames/SqueezeMeta on our system (https://documentation.sigma2.no/hpc_machines/saga.html) for metagenomic analyses (raw data processing, assembly and annotation, and binning) as well as amplicon analysis using dada2 (https://benjjneb.github.io/dada2). Additional scripts are to perform statistics and visualization of the data in R.  
 
 ## pull repository
 
@@ -16,7 +16,7 @@ Scripts were written by Alexander Eiler, Laurent Fontaine and Jing Wei.
 This Code is subject to the terms of the MIT License. 
 
 ## Project status
-Results from this project have been submitted to a peer-reviewed scientifc journal.
+Results from this project have been published in Nature Communications https://www.nature.com/articles/s41467-023-38806-w.
 
 ## Folders and code
 The analyses code is divided into two folders "metags" and "rRNA_amplicons" representing the code to analyze whole shotgun metagenomic and SSU rRNA gene amplicon data, respectively.
